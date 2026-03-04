@@ -1,0 +1,7 @@
+purchasePartId INTEGER PRIMARY KEY AUTOINCREMENT,purchaseId INTEGER,item TEXT
+1,1,"Poster"
+2,2,"Nail Clipper"
+3,3,"Laptop"
+4,3,"Monitor"
+5,4,"Monitor"
+6,4,"Keyboard"

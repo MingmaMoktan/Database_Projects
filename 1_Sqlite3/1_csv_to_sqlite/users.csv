@@ -1,0 +1,6 @@
+userId INTEGER PRIMARY KEY AUTOINCREMENT,email TEXT
+1,"tony@cooluser.com"
+2,"my@mail.com"
+3,"danny@boy.com"
+4,"titta@girl.com"
+5,"f51wt@mymail.com"
