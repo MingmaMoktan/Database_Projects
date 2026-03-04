@@ -1,0 +1,31 @@
+id,name,age,income,spending,education,location,employment_status
+1,John,35,75000,2000,Bachelors,NYC,Employed
+2,Emily,42,50000,3000,Bachelors,LA,Unemployed
+3,David,28,85000,3500,High school,Chicago,Self-Employed
+4,Jessica,24,60000,4000,Bachelors,Houston,Employed
+5,Michael,56,120000,4500,Bachelors,Phoenix,Unemployed
+6,Samantha,50,100000,5000,High school,Philadelphia,Self-Employed
+7,Matthew,32,90000,5500,Masters,San Antonio,Employed
+8,Ashley,45,80000,6000,Bachelors,San Diego,Unemployed
+9,Joshua,22,70000,6500,High school,Dallas,Self-Employed
+10,Amanda,40,60000,7000,Masters,San Jose,Employed
+11,Jacob,38,55000,7500,Bachelors,Austin,Unemployed
+12,Megan,30,50000,8000,High school,Jacksonville,Self-Employed
+13,Nicholas,26,45000,8500,High school,Fort Worth,Employed
+14,Emily,20,40000,9000,Bachelors,Charlotte,Unemployed
+15,Andrew,18,35000,9500,High school,San Francisco,Self-Employed
+16,Daniel,22,30000,10000,Masters,Charlotte,Employed
+17,Emily,25,25000,10500,Bachelors,NYC,Unemployed
+18,Jacob,28,20000,11000,High school,Seattle,Self-Employed
+19,Michael,31,15000,11500,Masters,NYC,Employed
+20,Emily,34,10000,12000,Bachelors,Washington DC,Unemployed
+21,Matthew,37,5000,12500,High school,Boston,Self-Employed
+22,Ashley,40,0,13000,Masters,NYC,Employed
+23,Joshua,43,-5000,13500,Bachelors,El Paso,Unemployed
+24,Amanda,46,-10000,14000,High school,Detroit,Self-Employed
+25,Jacob,49,-15000,14500,Masters,NYC,Employed
+26,Samantha,52,-20000,15000,Bachelors,Charlotte,Unemployed
+27,Michael,55,-25000,15500,High school,Oklahoma City,Self-Employed
+28,Ashley,58,-30000,16000,Masters,Las Vegas,Employed
+29,Joshua,61,-35000,16500,Bachelors,Charlotte,Unemployed
+30,Amanda,64,-40000,17000,High school,Baltimore,Self-Employed
