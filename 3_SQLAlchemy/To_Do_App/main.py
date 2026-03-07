@@ -4,6 +4,7 @@ from database import *
 from sqlalchemy import select, delete
 import hashlib
 
+# I have also tried to implement the password hashing for the practice in this assignment.
 def hash_password(password: str) -> str:
     return hashlib.md5(password.encode()).hexdigest()
 
