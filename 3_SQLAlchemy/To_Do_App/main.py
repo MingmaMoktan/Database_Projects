@@ -63,11 +63,11 @@ def view_items(user_id: int):
         if not user:
             print("User not found.")
             return
-        if not user.user_items:
+        if not user.user_item:
             print("No ToDo items found.")
             return
         print("Your ToDo Items:")
-        for ui in user.user_items:
+        for ui in user.user_item:
             print(f"{ui.item_id} {ui.item.title} - {ui.item.description} (Created at: {ui.item.created_at})")
             
 def add_item(user_id: int):
@@ -93,13 +93,15 @@ def delete_item(user_id: int):
         with Session() as session:
             item_id = input("Enter the ID of the item to delete: ")
             stmt = select(User_Item).where(User_Item.user_id == user_id, User_Item.item_id == item_id)
+            
             user_item = session.scalar(stmt)
+            
             if user_item:
-                session.delete(user_item)
+                session.delete(user_item.item)
                 session.commit()
-                print("Todo item deleted successfully!")
+                print("ToDo item deleted successfully!")
             else:
-                print("Item not found.")
+                print("Item not found or does not belong to you.")
     
     elif option == "2":
         with Session() as session:

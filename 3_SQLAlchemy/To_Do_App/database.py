@@ -18,7 +18,7 @@ class User(Base):
     name: Mapped[str] = mapped_column(nullable=False, unique=True)
     password: Mapped[str] = mapped_column(nullable=False)
     
-    user_items: Mapped[List["User_Item"]] = relationship(back_populates="user", cascade="all, delete-orphan")
+    user_item: Mapped[List["User_Item"]] = relationship(back_populates="user", cascade="all, delete-orphan")
 
 class Item(Base):
     __tablename__ = "items"
@@ -28,7 +28,7 @@ class Item(Base):
     description: Mapped[str | None] = mapped_column(nullable=True)
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
 
-    user_items: Mapped["User_Item"] = relationship(back_populates="item", cascade="all, delete-orphan") 
+    user_item: Mapped["User_Item"] = relationship(back_populates="item", cascade="all, delete-orphan")
 
 class User_Item(Base):
     __tablename__ = "user_items"
@@ -36,8 +36,8 @@ class User_Item(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), primary_key=True)
     item_id: Mapped[int] = mapped_column(ForeignKey("items.item_id"), primary_key=True)
     
-    user: Mapped["User"] = relationship(back_populates="user_items")
-    item: Mapped["Item"] = relationship(back_populates="user_items")
+    user: Mapped["User"] = relationship(back_populates="user_item")
+    item: Mapped["Item"] = relationship(back_populates="user_item")
 
 Base.metadata.create_all(engine)
 Session = sessionmaker(engine)
