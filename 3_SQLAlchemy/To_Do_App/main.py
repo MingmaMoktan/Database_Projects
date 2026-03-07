@@ -2,18 +2,25 @@ import os
 import sys
 from database import *
 from sqlalchemy import select, delete
+import hashlib
+
+def hash_password(password: str) -> str:
+    return hashlib.md5(password.encode()).hexdigest()
 
 def register_user():
     print("Register to create new account")
     name = input("Username: ")
     password = input("Password: ")
+    
+    hashed_password = hash_password(password)
+    
     with Session() as session:
         stmt = select(User).where(User.name == name)
         user = session.scalar(stmt)
         if user:
             print("Username already exists. Please choose a different username.")
             return
-        new_user = User(name=name, password=password)
+        new_user = User(name=name, password=hashed_password)
         session.add(new_user)
         session.commit()
         print("Registration successful! You can now log in.")
@@ -23,8 +30,11 @@ def login():
     print("Login")
     name = input("Username: ")
     password = input("Password: ")
+    
+    hashed_password = hash_password(password)
+    
     with Session() as session:
-        stmt = select(User).where(User.name == name, User.password == password)
+        stmt = select(User).where(User.name == name, User.password == hashed_password)
         user = session.scalar(stmt)
         if user:
             print("Login successful!")
