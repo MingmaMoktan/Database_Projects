@@ -1,7 +1,10 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker, mapped_column, Mapped
+from pathlib import Path
 
-engine = create_engine("sqlite+pysqlite:///todo.db", echo=False)
+DB_PATH = Path("/home/david_salome/mygitfolder/Database_Projects/3_SQLAlchemy/To_Do_App/todo.db")
+
+engine = create_engine(f"sqlite+pysqlite:///{DB_PATH}", echo=False)
 
 class Base(DeclarativeBase):
     pass

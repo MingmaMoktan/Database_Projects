@@ -1,9 +1,7 @@
 import os
 import sys
-
-items = []
-current_item_id = 0
-
+from database import *
+from sqlalchemy import select
 
 def app():
     print("Welcome to To-Do App! version 1.0")
@@ -24,41 +22,37 @@ def app():
         elif selection == "4": sys.exit("Goodbye!")
 
 def show_items():
-    if len(items) == 0:
-        print("No items to show")
-    else:
-        for item in items:
-            print(f'{item["id"]}. {item["name"]}')
+    print("Here are all your items: ")
+    with Session() as session:
+        stmt = select(Item)
+        items = session.scalars(stmt).all()
+        if len(items)<=0:
+            print("No items to show")
+        else:
+            for item in items:
+                print(f"{item.item_id}: {item.name}")
 
 def create_new_item():
-    global current_item_id
-    current_item_id += 1
-    name = input("Enter name of the item: ")
-    item = {
-        "id": current_item_id,
-        "name": name
-    }
-    items.append(item)
-    print("Created new item")
-
+    print("Name for the item:")
+    name = input()
+    with Session() as session:
+        new_item = Item(name=name)
+        session.add(new_item)
+        session.commit()
+        
+        
 def remove_item():
-    if len(items) <= 0:
-        print("No items to remove")
-        print("Add some items first")
-    else:
-        print("Which item do you want to remove?")
-        id = int(input())
-        
-        found_index = None # We are defining this because we need the index to remove the item from the list.
-        
-        for index, item in enumerate(items): # We fetch index based on id and we will use it to remove the item from the list.
-            if item["id"] == id:
-                found_index = index
-        if index is not None:
-            items.pop(found_index)
-            print("Item was removed")
+    print("Give ID to remove item:")
+    id = input()
+    with Session() as session:
+        stmt = select(Item).where(Item.item_id == id)
+        item = session.scalar(stmt)
+        if item is None:
+            print("No such item")
         else:
-            print("Item with given id was not found")
+            session.delete(item)
+            session.commit()
+            print(f"Item with id {id} removed")
 
 def main():
     app()
