@@ -1,4 +1,4 @@
-#!/home/david_salome/mygitfolder/Database_Projects/db_project/bin/python3
+#!/home/david_salome/mygitfolder/Database_Projects/db_venv/bin/python3
 
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
