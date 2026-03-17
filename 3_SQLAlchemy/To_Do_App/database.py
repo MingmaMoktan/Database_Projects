@@ -35,6 +35,7 @@ class User_Item(Base):
     
     user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), primary_key=True)
     item_id: Mapped[int] = mapped_column(ForeignKey("items.item_id"), primary_key=True)
+    is_owner: Mapped[bool] = mapped_column(default=False) # This helps to store ownwership per user-item relationship in user-item table
     
     user: Mapped["User"] = relationship(back_populates="user_item")
     item: Mapped["Item"] = relationship(back_populates="user_item")
