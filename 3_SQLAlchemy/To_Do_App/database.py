@@ -28,7 +28,7 @@ class Item(Base):
     description: Mapped[str | None] = mapped_column(nullable=True)
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
 
-    user_item: Mapped["User_Item"] = relationship(back_populates="item", cascade="all, delete-orphan")
+    user_item: Mapped[List['User_Item']] = relationship(back_populates="item", cascade='all, delete-orphan')
 
 class User_Item(Base):
     __tablename__ = "user_items"
