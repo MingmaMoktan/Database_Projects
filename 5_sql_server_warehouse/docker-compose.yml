@@ -1,0 +1,17 @@
+services:
+  sql-server:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sql_warehouse
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Dm@1995
+      - MSSQL_PID=Developer
+    volumes:
+      - mssql_data:/var/opt/mssql
+      - ./datasets:/var/opt/mssql/datasets  # Maps your local CSVs to the container
+    restart: always
+
+volumes:
+  mssql_data:
