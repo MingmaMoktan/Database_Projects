@@ -6,7 +6,7 @@ services:
       - "1433:1433"
     environment:
       - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=Dm@1995
+      - MSSQL_SA_PASSWORD=Project@123
       - MSSQL_PID=Developer
     volumes:
       - mssql_data:/var/opt/mssql
