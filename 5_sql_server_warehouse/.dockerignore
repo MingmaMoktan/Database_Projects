@@ -1,0 +1,21 @@
+# Ignore Git history
+.git
+.gitignore
+
+# Ignore Python virtual environments
+db_venv/
+env/
+venv/
+.venv/
+__pycache__/
+
+# Ignore the actual SQL Server data (Docker manages this via volumes)
+mssql_data/
+
+# Ignore IDE settings
+.vscode/
+.idea/
+.dbeaver/
+
+# Ignore documentation and local notes
+*.md
