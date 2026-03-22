@@ -1,0 +1,47 @@
+# 1. If you want to start with a completely empty database
+rm -f graph.db
+
+
+
+# 2. Create Nodes
+python graph.py --add-node --title "Helsinki"
+python graph.py --add-node --title "Tampere"
+
+
+
+
+# 3. You can also check and verify if the duplicate node can be formed (This should print 'Node 'Helsinki' already exists')
+python graph.py --add-node --title "Helsinki"
+
+
+
+
+# 4. Create Relationships (with Auto-create)
+# Link existing nodes
+python graph.py --add-relationship --from "Helsinki" --to "Tampere" --type "railroad"
+
+# Link to a non-existent node (Tests get_node helper)
+python graph.py --add-relationship --from "Tampere" --to "Pori" --type "railroad"
+
+
+
+
+# 5. Verify the database content
+# Should show Helsinki, Tampere, and Pori
+python graph.py --list-nodes
+
+
+
+# 6. Query Routes
+# Expected: Helsinki -[railroad]-> Tampere
+python graph.py --routes-from "Helsinki"
+
+# Expected: Tampere -[railroad]-> Pori
+python graph.py --routes-from "Tampere"
+
+
+
+
+# 7. Test Error Handling
+# Expected: Error: Node 'Rovaniemi' does not exist.
+python graph.py --routes-from "Rovaniemi"
