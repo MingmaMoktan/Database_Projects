@@ -9,12 +9,13 @@
 IF OBJECT_ID ('bronze.crm_cust_info', 'U') IS NOT NULL
 	DROP TABLE bronze.crm_cust_info;
 CREATE TABLE DataWarehouse.bronze.crm_cust_info (
-	cst_id INT NULL,
-	cst_key NVARCHAR(50),
-	cst_firstname NVARCHAR(50) ,
-	cst_lastname NVARCHAR(50),
-	cst_marital_status NVARCHAR(50),
-	cst_create_date DATE NULL
+    cst_id INT,
+    cst_key NVARCHAR(50),
+    cst_firstname NVARCHAR(50),
+    cst_lastname NVARCHAR(50),
+    cst_marital_status NVARCHAR(50),
+    cst_gndr NVARCHAR(50),      
+    cst_create_date DATE
 );
 
 
@@ -67,3 +68,60 @@ CREATE TABLE DataWarehouse.bronze.erp_px_cat_g1v2(
 	subcat NVARCHAR(50),
 	maintenance NVARCHAR(50)
 );
+
+
+-- To load the data in bulk we can use the following command
+-- Now if we run this script two times then it will load the data two times
+-- and create duplicate data so we can use TRUNCATE command to empty our table
+-- and load the data with the following command
+
+TRUNCATE TABLE bronze.crm_cust_info;
+BULK INSERT bronze.crm_cust_info
+FROM '/var/opt/mssql/datasets/source_crm/cust_info.csv'
+WITH (
+    FORMAT = 'CSV',
+    FIRSTROW = 2,           -- Skips the header row
+    FIELDTERMINATOR = ',',  -- Standard for CSV
+    ROWTERMINATOR = '0x0a', -- Linux line ending (Line Feed)
+    TABLOCK                 -- Makes it faster
+);
+
+-- We can also use the same command to do the bulk insert to insert data from other csv files
+-- Fill data of prd_info
+TRUNCATE TABLE bronze.crm_prd_info;
+BULK INSERT bronze.crm_prd_info
+FROM '/var/opt/mssql/datasets/source_crm/prd_info.csv'
+WITH (
+    FORMAT = 'CSV',
+    FIRSTROW = 2,           -- Skips the header row
+    FIELDTERMINATOR = ',',  -- Standard for CSV
+    ROWTERMINATOR = '0x0a', -- Linux line ending (Line Feed)
+    TABLOCK                 -- Makes it faster
+);
+
+-- Fill the data of sales_detail
+TRUNCATE TABLE bronze.crm_sales_detail;
+BULK INSERT bronze.crm_sales_detail
+FROM '/var/opt/mssql/datasets/source_crm/sales_details.csv'
+WITH (
+    FORMAT = 'CSV',
+    FIRSTROW = 2,           -- Skips the header row
+    FIELDTERMINATOR = ',',  -- Standard for CSV
+    ROWTERMINATOR = '0x0a', -- Linux line ending (Line Feed)
+    TABLOCK                 -- Makes it faster
+);
+
+-- Use same script for the erp source data as well
+TRUNCATE TABLE bronze.crm_sales_detail;
+BULK INSERT bronze.crm_sales_detail
+FROM '/var/opt/mssql/datasets/source_erp/CUST_AZ12.csv'
+WITH (
+    FORMAT = 'CSV',
+    FIRSTROW = 2,           -- Skips the header row
+    FIELDTERMINATOR = ',',  -- Standard for CSV
+    ROWTERMINATOR = '0x0a', -- Linux line ending (Line Feed)
+    TABLOCK                 -- Makes it faster
+);
+
+-- If you want to verify if the data has been loaded you can do 
+SELECT TOP 5 * FROM bronze.crm_cust_info;
