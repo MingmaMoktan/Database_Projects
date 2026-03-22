@@ -30,6 +30,15 @@ END
 GO
 */
 
+/*
+-- To see all the tables inside the specific schema like bronze
+SELECT table_name 
+FROM information_schema.tables 
+WHERE table_schema = 'bronze';
+*/
+
+
+
 CREATE DATABASE DataWarehouse;
 GO
 
