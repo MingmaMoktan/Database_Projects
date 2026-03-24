@@ -122,7 +122,7 @@ FROM(
 
 -- All above column were to check and transform the data now we will insert the data into the table in silver layer.
 -- Above Final transformed code carries all the transformations in which we will now use the INSERT statement to insert the data in silver column.
--- Here is the INSERT statement with all the transfromations CLEAN AND LOAD DATA IN silver.crm_cust_info
+-- Table silver.crm_cust_info: Here is the INSERT statement with all the transfromations CLEAN AND LOAD DATA IN silver.crm_cust_info
 INSERT INTO silver.crm_cust_info (
     cst_id,
     cst_key,
@@ -140,11 +140,11 @@ TRIM(cst_lastname) as cst_lastname,
 CASE WHEN UPPER(cst_marital_status) = 'M' THEN 'Married'
      WHEN UPPER(cst_marital_status) = 'S' THEN 'Single'
      ELSE 'n/a'
-END cst_marital_status,
+END AS cst_marital_status,
 CASE WHEN UPPER(cst_gndr) = 'F' THEN 'Female'
      WHEN UPPER (cst_gndr) = 'M' THEN 'Male'
      ElSE 'n/a'
-END cst_gndr,
+END AS cst_gndr,
 cst_create_date
 FROM(
     SELECT
@@ -161,6 +161,7 @@ FROM(
 
 
 -- CLEAN AND LOAD DATA IN silver.crm_prd_info
+-- check
 SELECT
 prd_id,
 prd_key,
@@ -168,11 +169,100 @@ prd_key,
 -- We will also use the REPLACE function because CO-RF and CO_RF are different
 -- And REPLACE function will replace '-' with '_' to match the id.
 REPLACE(SUBSTRING(prd_key, 1, 5), '-', '_') AS cat_id, 
+SUBSTRING(prd_key, 7, LEN(prd_key)) AS prd_key,
 prd_nm,
-prd_cost,
-prd_line,
+ISNULL(prd_cost, 0) AS prd_cost,
+CASE UPPER(TRIM(prd_line))
+    WHEN 'M' THEN 'Mountain'
+    WHEN 'R' THEN 'Road'
+    WHEN 'S' THEN 'Other Sales'
+    WHEN 'T' THEN 'Touring'
+    ELSE 'n/a'
+END AS prd_line,
 prd_start_dt,
 prd_end_dt
-FROM bronze.crm_prd_info
-WHERE REPLACE(SUBSTRING(prd_key, 1, 5), '-', '_') NOT IN -- this checks if any cat_id is missing comparing with table erp_px_cat_g1v2
+FROM bronze.crm_prd_info;
+
+-- Add the following filter to check if any cat_id is missing comparing with table erp_px_cat_g1v2
+WHERE REPLACE(SUBSTRING(prd_key, 1, 5), '-', '_') NOT IN
 (SELECT DISTINCT id from bronze.erp_px_cat_g1v2)
+
+
+-- Check for unwanted spaces
+SELECT
+prd_nm
+FROM
+bronze.crm_prd_info
+WHERE TRIM(prd_nm)!=prd_nm;
+
+-- Check if the prd_cost is negative which is not practical and or prd_cost is null
+SELECT
+prd_cost
+FROM
+bronze.crm_prd_info
+WHERE prd_cost<0 OR prd_cost IS NULL;
+
+-- Now if we check the start and end data then they make no sense as end date is before the start date.
+-- So we need to switch the end date and start date in such a way that the dates do not overlap.
+-- So for this we will use the LEAD () window function 
+INSERT INTO silver.crm_prd_info(
+    prd_id,
+    cat_id,
+    prd_key,
+    prd_nm,
+    prd_cost,
+    prd_line,
+    prd_start_dt,
+    prd_end_dt
+)
+SELECT
+prd_id,
+-- HERE below we are extracting the 5 first characters to create cat_id that matches cat_id from another table
+-- We will also use the REPLACE function because CO-RF and CO_RF are different
+-- And REPLACE function will replace '-' with '_' to match the id.
+REPLACE(SUBSTRING(prd_key, 1, 5), '-', '_') AS cat_id, 
+SUBSTRING(prd_key, 7, LEN(prd_key)) AS prd_key,
+prd_nm,
+ISNULL(prd_cost, 0) AS prd_cost,
+CASE UPPER(TRIM(prd_line))
+    WHEN 'M' THEN 'Mountain'
+    WHEN 'R' THEN 'Road'
+    WHEN 'S' THEN 'Other Sales'
+    WHEN 'T' THEN 'Touring'
+    ELSE 'n/a'
+END AS prd_line,
+CAST (prd_start_dt AS DATE) AS prd_start_dt,
+CAST (LEAD (prd_start_dt) OVER (PARTITION BY prd_key ORDER BY prd_start_dt)-1 AS DATE) AS prd_end_dt -- Here we did -1 so that dates do not overlap
+FROM bronze.crm_prd_info;
+
+-- Now that we have very good transformation 
+-- we also added cat_id and then changed the prd_start_dt and prd_end_dt into DATE
+-- So we need to CREATE new silver.crm_prd_info table which you can see in the silver ddl script
+
+
+
+
+
+-- crm_sales_info table
+-- Checking the data quality
+SELECT
+sls_ord_num,
+sls_prd_key,
+sls_cust_id,
+NULLIF (sls_order_dt,0) AS sls_order_dt,
+sls_ship_dt,
+sls_due_dt,
+sls_sales,
+sls_quantity,
+sls_price
+FROM 
+bronze.crm_sales_details
+WHERE sls_ord_num !=TRIM(sls_ord_num);
+
+
+-- check if the dates are negative or null
+SELECT 
+sls_order_dt
+FROM
+bronze.crm_sales_details
+WHERE sls_ship_dt=0;
