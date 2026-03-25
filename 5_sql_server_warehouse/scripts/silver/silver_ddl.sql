@@ -34,15 +34,15 @@ CREATE TABLE DataWarehouse.silver.crm_prd_info(
 	dwh_create_date DATETIME DEFAULT GETDATE()
 );
 
-IF OBJECT_ID ('silver.crm_sales_detail', 'U') IS NOT NULL
-	DROP TABLE silver.crm_sales_detail;
-CREATE TABLE DataWarehouse.silver.crm_sales_detail(
+IF OBJECT_ID ('silver.crm_sales_details', 'U') IS NOT NULL
+	DROP TABLE silver.crm_sales_details;
+CREATE TABLE DataWarehouse.silver.crm_sales_details(
 	sls_ord_num NVARCHAR(50),
 	sls_prd_key NVARCHAR(50),
 	sls_cust_id INT,
-	sls_order_id INT,
-	sls_ship_dt INT,
-	sls_due_dt INT,
+	sls_order_id DATE,
+	sls_ship_dt DATE,
+	sls_due_dt DATE,
 	sls_sales INT,
 	sls_quantity INT,
 	sls_price INT,

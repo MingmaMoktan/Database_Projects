@@ -297,7 +297,9 @@ FROM
 bronze.crm_sales_details;
 
 -- Check if the tables connects properly or not or there are any missing data mismatch between table crm_sales_detail and crm_prd_info
-INSERT
+-- But before you go and insert the data check if the column attributes and table matches or not
+-- Since we did the CASTING of the date from INT to DATE we also need to make the new table that exctly has this
+INSERT INTO silver.crm_sales_detail
 
 SELECT
 sls_ord_num,
