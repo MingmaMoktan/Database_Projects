@@ -50,11 +50,6 @@ FROM(
 
 
 
-
-
-
-
-
 -- Check for unwanted spaces
 SELECT 
 cst_firstname
@@ -79,12 +74,6 @@ FROM(
     FROM bronze.crm_cust_info
     WHERE cst_id IS NOT NULL
 )t WHERE flag_last=1;
-
-
-
-
-
-
 
 
 
@@ -116,7 +105,6 @@ FROM(
     FROM bronze.crm_cust_info
     WHERE cst_id IS NOT NULL
 )t WHERE flag_last=1;
-
 
 
 
@@ -160,6 +148,8 @@ FROM(
 
 
 
+
+-- =========================================================================================================================
 -- CLEAN AND LOAD DATA IN silver.crm_prd_info
 -- check
 SELECT
@@ -243,26 +233,92 @@ FROM bronze.crm_prd_info;
 
 
 
+
+
+
+-- ==============================================================================================================================
 -- crm_sales_info table
 -- Checking the data quality
-SELECT
-sls_ord_num,
-sls_prd_key,
-sls_cust_id,
-NULLIF (sls_order_dt,0) AS sls_order_dt,
-sls_ship_dt,
-sls_due_dt,
+-- In this crm_sales_info table column that contain the dates are not in DATE format but in integer.
+-- So we need to check the negatives in date if exists as dates cannot be negative
+-- Also we need to convert these dates which are in integer to the real DATE FORMAT
+-- check if the dates are negative or null
+-- not only this but check every date column
+-- if there are 0 in dates the change them into NULLS
+-- Also check if the dates mentioned are unrealistic
+-- Do this for all other columns like sls_ship_dt and sls_due_dt
+SELECT 
+NULLIF(sls_order_dt, 0) AS sls_order_dt
+FROM
+bronze.crm_sales_details
+WHERE sls_order_dt<=0 
+OR LEN(sls_order_dt)!=8
+OR sls_order_dt>20500101
+OR sls_order_dt<19900101;
+
+
+-- Now that we have checked for all the dates we also need to check if order date is before the shiping date or not
+SELECT 
+*
+FROM
+bronze.crm_sales_details
+WHERE sls_order_dt>sls_ship_dt
+OR sls_order_dt>sls_due_dt;
+
+
+-- Next we also need to check
+-- Total sales = Quantity * Price
+-- So for this total sales cannot be zero and nulls are also not allowed
+
+SELECT DISTINCT
 sls_sales,
 sls_quantity,
 sls_price
 FROM 
 bronze.crm_sales_details
-WHERE sls_ord_num !=TRIM(sls_ord_num);
+WHERE sls_sales != sls_quantity*sls_price
+OR sls_sales IS NULL OR sls_quantity IS NULL OR sls_price IS NULL
+OR sls_sales<=0 OR sls_quantity<=0 OR sls_price<=0
+ORDER BY sls_sales, sls_quantity, sls_price;
 
+-- check the transformations
+SELECT
+sls_sales AS old_sls_sales,
+sls_quantity,
+sls_price AS old_sls_price,
+CASE WHEN sls_sales != sls_quantity*sls_price OR sls_sales<=0 OR sls_sales!=sls_quantity*ABS(sls_price) THEN sls_quantity*ABS(sls_price)
+     ELSE sls_sales
+END AS sls_sales,
+sls_quantity,
+CASE WHEN sls_price IS NULL OR sls_price<=0 THEN sls_sales/NULLIF(sls_quantity, 0)
+     ELSE sls_price
+END AS sls_price
+FROM 
+bronze.crm_sales_details;
 
--- check if the dates are negative or null
-SELECT 
-sls_order_dt
-FROM
-bronze.crm_sales_details
-WHERE sls_ship_dt=0;
+-- Check if the tables connects properly or not or there are any missing data mismatch between table crm_sales_detail and crm_prd_info
+INSERT
+
+SELECT
+sls_ord_num,
+sls_prd_key,
+sls_cust_id,
+CASE WHEN sls_order_dt=0 OR LEN(sls_order_dt)!=8 THEN NULL
+     ELSE CAST(CAST(sls_order_dt AS VARCHAR) AS DATE)
+END AS sls_order_dt,
+CASE WHEN sls_ship_dt=0 OR LEN(sls_ship_dt)!=8 THEN NULL
+     ELSE CAST(CAST(sls_ship_dt AS VARCHAR) AS DATE)
+END AS sls_ship_dt,
+CASE WHEN sls_due_dt=0 OR LEN(sls_due_dt)!=8 THEN NULL
+     ELSE CAST(CAST(sls_due_dt AS VARCHAR) AS DATE)
+END AS sls_due_dt,
+CASE WHEN sls_sales != sls_quantity*sls_price OR sls_sales<=0 OR sls_sales!=sls_quantity*ABS(sls_price) THEN sls_quantity*ABS(sls_price)
+     ELSE sls_sales
+END AS sls_sales,
+sls_quantity,
+CASE WHEN sls_price IS NULL OR sls_price<=0 THEN sls_sales/NULLIF(sls_quantity, 0)
+     ELSE sls_price
+END AS sls_price
+FROM 
+bronze.crm_sales_details;
+-- Check also for another column sls_cust_id in silver.crm_cust_info same way
