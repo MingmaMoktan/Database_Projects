@@ -333,3 +333,25 @@ END AS sls_price
 FROM 
 bronze.crm_sales_details;
 -- Check also for another column sls_cust_id in silver.crm_cust_info same way
+
+
+
+
+
+-- =======================================================================================
+-- Checking the table bronze.erp_cust_az12
+-- Now also check the bdate if there are outliers
+SELECT
+CASE WHEN cid LIKE 'NAS%' THEN SUBSTRING(cid, 4, LEN(cid))
+	 ELSE cid
+END AS cid,
+CASE WHEN bdate>GETDATE() THEN NULL
+     ELSE bdate
+END AS bdate,
+CASE WHEN UPPER(TRIM(gen)) IN ('F', 'FEMALE') THEN 'Female'
+     WHEN UPPER(TRIM(gen)) IN ('M', 'Male') THEN 'Male'
+     ELSE gen
+END AS gen
+FROM 
+bronze.erp_cust_az12; -- This will check if the bdate is too much or the bdate is in future
+
