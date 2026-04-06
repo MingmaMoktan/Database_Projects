@@ -105,3 +105,5 @@ CASE WHEN sls_price IS NULL OR sls_price<=0 THEN sls_sales/NULLIF(sls_quantity, 
 END AS sls_price
 FROM 
 bronze.crm_sales_details;
+
+

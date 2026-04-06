@@ -354,4 +354,3 @@ CASE WHEN UPPER(TRIM(gen)) IN ('F', 'FEMALE') THEN 'Female'
 END AS gen
 FROM 
 bronze.erp_cust_az12; -- This will check if the bdate is too much or the bdate is in future
-
