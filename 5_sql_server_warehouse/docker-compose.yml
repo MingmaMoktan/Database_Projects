@@ -10,7 +10,7 @@ services:
       - MSSQL_PID=Developer
     volumes:
       - mssql_data:/var/opt/mssql
-      - ./datasets:/var/opt/mssql/datasets  # Maps your local CSVs to the container
+      - ./datasets:/var/opt/mssql/datasets  # Maps local CSVs to the container
     restart: always
 
 volumes:
