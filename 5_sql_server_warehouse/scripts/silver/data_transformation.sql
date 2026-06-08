@@ -341,6 +341,11 @@ bronze.crm_sales_details;
 -- =======================================================================================
 -- Checking the table bronze.erp_cust_az12
 -- Now also check the bdate if there are outliers
+
+INSERT INTO silver.erp_cust_az12(cid, bdate, gen)
+
+-- This now inserts the following transformed data into the silver erp_cust_az12
+
 SELECT
 CASE WHEN cid LIKE 'NAS%' THEN SUBSTRING(cid, 4, LEN(cid))
 	 ELSE cid
@@ -354,3 +359,7 @@ CASE WHEN UPPER(TRIM(gen)) IN ('F', 'FEMALE') THEN 'Female'
 END AS gen
 FROM 
 bronze.erp_cust_az12; -- This will check if the bdate is too much or the bdate is in future
+
+
+
+
