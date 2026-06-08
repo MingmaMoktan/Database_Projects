@@ -9,8 +9,6 @@ datasets/*.csv
 datasets/*.xlsx
 *.csv
 *.xlsx
-
-mssql_data/
 optimization/workshop.db
 **/*.db
 
