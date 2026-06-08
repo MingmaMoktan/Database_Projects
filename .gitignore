@@ -9,7 +9,10 @@ datasets/*.csv
 datasets/*.xlsx
 *.csv
 *.xlsx
-*.db
+
+mssql_data/
+optimization/workshop.db
+**/*.db
 
 # ====================================================================
 # PYTHON & ENVIRONMENTS
