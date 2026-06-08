@@ -9,6 +9,7 @@ datasets/*.csv
 datasets/*.xlsx
 *.csv
 *.xlsx
+*workshop.db
 
 # ====================================================================
 # PYTHON & ENVIRONMENTS
