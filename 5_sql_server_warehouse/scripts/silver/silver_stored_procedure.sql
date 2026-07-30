@@ -1,24 +1,19 @@
-CREATE OR ALTER PROCEDURE silver.load_crm_cust_info
+CREATE OR ALTER PROCEDURE silver.load_silver_layer
 AS
 BEGIN
     SET NOCOUNT ON;
 
+    PRINT '==================================================';
+    PRINT 'Starting Silver Layer Loading Process';
+    PRINT '==================================================';
+
+    -- 1. Load crm_cust_info
     PRINT '--------------------------------------------------';
     PRINT 'Loading Silver.crm_cust_info';
     PRINT '--------------------------------------------------';
-
-    -- Truncate table to prevent duplicates
     TRUNCATE TABLE silver.crm_cust_info;
-
-    -- Insert transformed data
     INSERT INTO silver.crm_cust_info (
-        cst_id,
-        cst_key,
-        cst_firstname,
-        cst_lastname,
-        cst_marital_status,
-        cst_gndr,
-        cst_create_date
+        cst_id, cst_key, cst_firstname, cst_lastname, cst_marital_status, cst_gndr, cst_create_date
     )
     SELECT
         cst_id,
@@ -35,40 +30,20 @@ BEGIN
         END AS cst_gndr,
         cst_create_date
     FROM(
-        SELECT
-            *,
+        SELECT *,
             ROW_NUMBER() OVER(PARTITION BY cst_id ORDER BY cst_create_date DESC) AS flag_last
         FROM bronze.crm_cust_info
         WHERE cst_id IS NOT NULL
     )t WHERE flag_last = 1;
-
     PRINT '>> Finished loading silver.crm_cust_info';
-END;
-GO
 
-
-CREATE OR ALTER PROCEDURE silver.load_crm_prd_info
-AS
-BEGIN
-    SET NOCOUNT ON;
-
+    -- 2. Load crm_prd_info
     PRINT '--------------------------------------------------';
     PRINT 'Loading Silver.crm_prd_info';
     PRINT '--------------------------------------------------';
-
-    -- Truncate table to prevent duplicates
     TRUNCATE TABLE silver.crm_prd_info;
-
-    -- Insert transformed data
     INSERT INTO silver.crm_prd_info(
-        prd_id,
-        cat_id,
-        prd_key,
-        prd_nm,
-        prd_cost,
-        prd_line,
-        prd_start_dt,
-        prd_end_dt
+        prd_id, cat_id, prd_key, prd_nm, prd_cost, prd_line, prd_start_dt, prd_end_dt
     )
     SELECT
         prd_id,
@@ -86,34 +61,15 @@ BEGIN
         CAST (prd_start_dt AS DATE) AS prd_start_dt,
         CAST (LEAD (prd_start_dt) OVER (PARTITION BY prd_key ORDER BY prd_start_dt) - 1 AS DATE) AS prd_end_dt 
     FROM bronze.crm_prd_info;
-
     PRINT '>> Finished loading silver.crm_prd_info';
-END;
-GO
 
-CREATE OR ALTER PROCEDURE silver.load_crm_sales_details
-AS
-BEGIN
-    SET NOCOUNT ON;
-
+    -- 3. Load crm_sales_details
     PRINT '--------------------------------------------------';
     PRINT 'Loading Silver.crm_sales_details';
     PRINT '--------------------------------------------------';
-
-    -- Truncate table to prevent duplicates
     TRUNCATE TABLE silver.crm_sales_details;
-
-    -- Insert transformed data
     INSERT INTO silver.crm_sales_details(
-         sls_ord_num,
-         sls_prd_key,
-         sls_cust_id,
-         sls_order_id, -- Note: matching your schema design layout
-         sls_ship_dt,
-         sls_due_dt,
-         sls_sales,
-         sls_quantity,
-         sls_price 
+         sls_ord_num, sls_prd_key, sls_cust_id, sls_order_id, sls_ship_dt, sls_due_dt, sls_sales, sls_quantity, sls_price 
     )
     SELECT
         sls_ord_num,
@@ -136,24 +92,13 @@ BEGIN
              ELSE sls_price
         END AS sls_price
     FROM bronze.crm_sales_details;
-
     PRINT '>> Finished loading silver.crm_sales_details';
-END;
-GO
 
-CREATE OR ALTER PROCEDURE silver.load_erp_cust_az12
-AS
-BEGIN
-    SET NOCOUNT ON;
-
+    -- 4. Load erp_cust_az12
     PRINT '--------------------------------------------------';
     PRINT 'Loading Silver.erp_cust_az12';
     PRINT '--------------------------------------------------';
-
-    -- Truncate table to prevent duplicates
     TRUNCATE TABLE silver.erp_cust_az12;
-
-    -- Insert transformed data
     INSERT INTO silver.erp_cust_az12(cid, bdate, gen)
     SELECT
         CASE WHEN cid LIKE 'NAS%' THEN SUBSTRING(cid, 4, LEN(cid))
@@ -167,24 +112,13 @@ BEGIN
              ELSE 'n/a'
         END AS gen
     FROM bronze.erp_cust_az12;
-
     PRINT '>> Finished loading silver.erp_cust_az12';
-END;
-GO
 
-CREATE OR ALTER PROCEDURE silver.load_erp_loc_a101
-AS
-BEGIN
-    SET NOCOUNT ON;
-
+    -- 5. Load erp_loc_a101
     PRINT '--------------------------------------------------';
     PRINT 'Loading Silver.erp_loc_a101';
     PRINT '--------------------------------------------------';
-
-    -- Truncate table to prevent duplicates
     TRUNCATE TABLE silver.erp_loc_a101;
-
-    -- Insert transformed data
     INSERT INTO silver.erp_loc_a101 (cid, cntry)
     SELECT 
         REPLACE(cid, '-', '') cid,
@@ -195,31 +129,20 @@ BEGIN
              ELSE TRIM(cntry)
         END AS cntry
     FROM bronze.erp_loc_a101;
-
     PRINT '>> Finished loading silver.erp_loc_a101';
-END;
-GO
 
-CREATE OR ALTER PROCEDURE silver.load_erp_px_cat_g1v2
-AS
-BEGIN
-    SET NOCOUNT ON;
-
+    -- 6. Load erp_px_cat_g1v2
     PRINT '--------------------------------------------------';
     PRINT 'Loading Silver.erp_px_cat_g1v2';
     PRINT '--------------------------------------------------';
-
-    -- Truncate table to prevent duplicates
     TRUNCATE TABLE silver.erp_px_cat_g1v2;
-
-    -- Insert data as-is
     INSERT INTO silver.erp_px_cat_g1v2 (id, cat, subcat, maintenance)
     SELECT id, cat, subcat, maintenance 
     FROM bronze.erp_px_cat_g1v2;
-
     PRINT '>> Finished loading silver.erp_px_cat_g1v2';
+
+    PRINT '==================================================';
+    PRINT 'Silver Layer Loading Completed Successfully';
+    PRINT '==================================================';
 END;
 GO
-
--- To run this script we just need to type the statement below
--- EXEC silver.load_silver_layer;
