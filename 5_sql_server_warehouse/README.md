@@ -75,7 +75,3 @@ Copyright (c) 2024 [Mingma Moktan/MingmaMoktan]. All rights reserved.
 This project is licensed under the **MIT License**. You are free to use, modify, and distribute this software for personal or commercial purposes, provided that the original copyright notice and permission notice are included in all copies or substantial portions of the software.
 
 ---
-
-**Note:** Ensure that the `mssql_data/` directory is never committed to version control to protect database integrity and repository size.
-
----
