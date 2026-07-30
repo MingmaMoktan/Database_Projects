@@ -145,3 +145,6 @@ BEGIN
     PRINT 'Silver Layer Loading Completed Successfully';
     PRINT '==================================================';
 END;
+
+-- To use this store procedure just use the following statement
+-- EXEC silver.load_silver_layer;
