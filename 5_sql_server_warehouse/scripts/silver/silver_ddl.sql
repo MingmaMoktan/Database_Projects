@@ -16,7 +16,7 @@ CREATE TABLE DataWarehouse.silver.crm_cust_info (
     cst_marital_status NVARCHAR(50),
     cst_gndr NVARCHAR(50),      
     cst_create_date DATE,
-	dwh_create_date DATETIME DEFAULT GETDATE() -- This is metadata added for our own reference for each table this will tell when this table was created
+	dwh_create_date DATETIME DEFAULT GETDATE() -- This is metadata added for our own reference for each rown of the data inserted in the table
 );
 
 
