@@ -145,4 +145,3 @@ BEGIN
     PRINT 'Silver Layer Loading Completed Successfully';
     PRINT '==================================================';
 END;
-GO
