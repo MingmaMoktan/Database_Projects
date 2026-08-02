@@ -107,3 +107,47 @@ FROM
 bronze.crm_sales_details;
 
 
+
+-- Data Transformation for the table erp_cust_az12
+INSERT INTO silver.erp_cust_az12(cid, bdate, gen)
+
+-- This now inserts the following transformed data into the silver erp_cust_az12
+
+SELECT
+CASE WHEN cid LIKE 'NAS%' THEN SUBSTRING(cid, 4, LEN(cid))
+	 ELSE cid
+END AS cid,
+CASE WHEN bdate>GETDATE() THEN NULL
+     ELSE bdate
+END AS bdate,
+CASE WHEN UPPER(gen) LIKE 'F%' THEN 'Female'
+     WHEN UPPER(gen) LIKE 'M%' THEN 'Male'
+     ELSE 'n/a'
+END AS gen
+FROM 
+bronze.erp_cust_az12; -- This will check if the bdate is too much or the bdate is in future
+
+
+
+
+
+-- Data Transformation for the table erp_loc_a101
+INSERT INTO silver.erp_loc_a101
+(cid, cntry)
+SELECT 
+REPLACE(cid, '-','') cid,
+CASE 
+     WHEN UPPER(TRIM(cntry)) LIKE 'DE%' THEN 'Germany'
+	 WHEN UPPER(TRIM(cntry)) LIKE 'US%' THEN 'United States'
+	 WHEN TRIM(cntry) = '' OR cntry IS NULL THEN 'n/a'
+	 ELSE TRIM(cntry)
+END AS cntry
+
+FROM bronze.erp_loc_a101;
+
+
+
+-- Data Transformation for the table erp_px_cat_g1v2
+-- Since we found no any issue with the data quality we are inserting the data as it is
+INSERT INTO silver.erp_px_cat_g1v2 (id, cat, subcat, maintenance)
+SELECT * FROM bronze.erp_px_cat_g1v2
