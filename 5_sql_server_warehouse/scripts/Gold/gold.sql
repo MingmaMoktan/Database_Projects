@@ -47,13 +47,13 @@ SELECT
 	ci.cst_firstname AS first_name,
 	ci.cst_lastname AS last_name,
     ci.cst_marital_status AS maritial_status,
+	ca.bdate AS birth_date,
+	la.cntry AS country
     CASE 
         WHEN ci.cst_gndr != 'n/a' THEN ci.cst_gndr  -- Use CRM if it's valid
         ELSE COALESCE(ca.gen, 'n/a')                -- Otherwise use ERP, or default to 'n/a' if both are blank
     END AS gender,
 	ci.cst_create_date AS create_date,
-	ca.bdate AS birth_date,
-	la.cntry AS country
 FROM silver.crm_cust_info ci
 LEFT JOIN silver.erp_cust_az12 ca
 ON 	ci.cst_key = ca.cid
