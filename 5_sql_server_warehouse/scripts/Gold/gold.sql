@@ -41,21 +41,30 @@ ORDER BY 1, 2
 
 
 -- So here is the final script here we will also add the column name that is more clear and readable
+-- This is describing the customer so this is clearly the dimension table as this doesn't have any transactions and events
+-- Here we have primary key on the table which may not be on other dimension so we need to generate another one which is also called the surrogate key
+-- 
+
 SELECT 
-	ci.cst_id AS customer_id,
+	ROW_NUMBER() OVER (ORDER BY cst_id) AS customer_key,
+	ci.cst_id AS customer_id, -- Here we have primary key on the table which may not be on other dimension so we need to generate another one which is also called the surrogate key
 	ci.cst_key AS customer_number,
 	ci.cst_firstname AS first_name,
 	ci.cst_lastname AS last_name,
-    ci.cst_marital_status AS maritial_status,
-	ca.bdate AS birth_date,
-	la.cntry AS country
+	la.cntry AS country,
     CASE 
         WHEN ci.cst_gndr != 'n/a' THEN ci.cst_gndr  -- Use CRM if it's valid
         ELSE COALESCE(ca.gen, 'n/a')                -- Otherwise use ERP, or default to 'n/a' if both are blank
     END AS gender,
-	ci.cst_create_date AS create_date,
+	ca.bdate AS birth_date,
+    ci.cst_marital_status AS maritial_status,
+	ci.cst_create_date AS create_date
 FROM silver.crm_cust_info ci
 LEFT JOIN silver.erp_cust_az12 ca
 ON 	ci.cst_key = ca.cid
 LEFT JOIN silver.erp_loc_a101 la
 ON 	ci.cst_key = la.cid
+
+
+
+
