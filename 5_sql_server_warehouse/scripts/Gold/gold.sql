@@ -68,3 +68,63 @@ ON 	ci.cst_key = la.cid
 
 
 
+
+
+-- Now we want to create the product information table
+-- In product table we have the historical data and current data
+-- So then for the recent and current analysis we should always take the current data while historical data is also good but not for making the present decisions
+-- So for this we are going to use the date as the filter
+-- In this product data there is a column where there is end_date or prd_end_date which shows it usually is the historical data
+-- So we should filter them out and put only those data which have the end_date or prd_date null as null tells us it has not ended and then it is current data
+-- And for the final part we have to join the product category table to get all product category data
+-- And also check if the data is unique for this we use subquery method
+-- And now we arrange the column and then give readble names for the columns
+SELECT prd_key, COUNT(*) FROM (
+SELECT
+	pn.prd_id AS product_id,
+	pn.prd_key AS product_number,
+	pn.prd_nm AS product_name,
+	pn.cat_id AS category_id,
+	pc.cat AS category,
+	pc.subcat AS subcategory,
+	pc.maintenance,
+	pn.prd_cost AS cost,
+	pn.prd_line AS product_line,
+	pn.prd_start_dt AS start_date
+FROM silver.crm_prd_info pn
+LEFT JOIN silver.erp_px_cat_g1v2 pc
+ON pn.cat_id = pc.id
+WHERE prd_end_dt IS NULL -- This filters out all historical data
+)t 
+GROUP BY prd_key
+HAVING COUNT(*)>1
+
+
+-- Here is the final script to create the product view
+-- Here we have the description about the product and there is no transactions like order, order date 
+-- So we will generate the dimension view for the product
+-- Also creating the surrogate key with the product start date is to filter which product is latest on the production
+CREATE VIEW gold.dim_customers AS
+SELECT
+	ROW_NUMBER() OVER (ORDER BY pn.prd_start_dt, pn.prd_key) AS product_key, -- if you forget the logic here look onto this as we use product_start_dt to arrange
+	-- but start date may be same for some products so we have to order them again so we used product key
+	pn.prd_id AS product_id,
+	pn.prd_key AS product_number,
+	pn.prd_nm AS product_name,
+	pn.cat_id AS category_id,
+	pc.cat AS category,
+	pc.subcat AS subcategory,
+	pc.maintenance,
+	pn.prd_cost AS cost,
+	pn.prd_line AS product_line,
+	pn.prd_start_dt AS start_date
+FROM silver.crm_prd_info pn
+LEFT JOIN silver.erp_px_cat_g1v2 pc
+ON pn.cat_id = pc.id
+WHERE prd_end_dt IS NULL -- This filters out all historical data
+
+
+
+
+-- So now we have only one table left for the fact that is the sales tables
+-- 
