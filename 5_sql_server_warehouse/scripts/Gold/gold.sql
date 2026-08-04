@@ -44,7 +44,7 @@ ORDER BY 1, 2
 -- This is describing the customer so this is clearly the dimension table as this doesn't have any transactions and events
 -- Here we have primary key on the table which may not be on other dimension so we need to generate another one which is also called the surrogate key
 -- 
-
+CREATE VIEW gold.dim_customers AS
 SELECT 
 	ROW_NUMBER() OVER (ORDER BY cst_id) AS customer_key,
 	ci.cst_id AS customer_id, -- Here we have primary key on the table which may not be on other dimension so we need to generate another one which is also called the surrogate key
