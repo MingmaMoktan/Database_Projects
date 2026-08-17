@@ -40,7 +40,7 @@ CREATE TABLE DataWarehouse.silver.crm_sales_details(
 	sls_ord_num NVARCHAR(50),
 	sls_prd_key NVARCHAR(50),
 	sls_cust_id INT,
-	sls_order_id DATE,
+	sls_order_dt DATE,
 	sls_ship_dt DATE,
 	sls_due_dt DATE,
 	sls_sales INT,

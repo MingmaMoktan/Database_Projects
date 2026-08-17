@@ -104,7 +104,7 @@ HAVING COUNT(*)>1
 -- Here we have the description about the product and there is no transactions like order, order date 
 -- So we will generate the dimension view for the product
 -- Also creating the surrogate key with the product start date is to filter which product is latest on the production
-CREATE VIEW gold.dim_customers AS
+CREATE VIEW gold.dim_product AS
 SELECT
 	ROW_NUMBER() OVER (ORDER BY pn.prd_start_dt, pn.prd_key) AS product_key, -- if you forget the logic here look onto this as we use product_start_dt to arrange
 	-- but start date may be same for some products so we have to order them again so we used product key
@@ -127,4 +127,17 @@ WHERE prd_end_dt IS NULL -- This filters out all historical data
 
 
 -- So now we have only one table left for the fact that is the sales tables
--- 
+-- So we have only one table for the sales.
+-- Dimension means the data and tables that describes 
+-- Facts are the real events that keeps on changing based on facts.
+SELECT
+sd.sls_ord_num,
+sd.sls_prd_key,
+sd.sls_cust_id,
+sd.sls_order_dt,
+sd.sls_ship_dt,
+sd.sls_due_dt,
+sd.sls_sales,
+sd.sls_quantity,
+sd.sls_price
+FROM silver.crm_sales_details sd
