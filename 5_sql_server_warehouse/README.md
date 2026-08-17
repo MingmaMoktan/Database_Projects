@@ -46,7 +46,7 @@ Connect to the instance using the following parameters:
 
 ## Data Architecture
 
-![Data Warehouse Architecture](Data_Architecture.png)
+![Data Warehouse Architecture](docs/Data_Architecture.png)
 
 ### Bronze Layer (Raw)
 Initial ingestion of raw CSV data from ERP and CRM systems. Data is stored in its original format to ensure a full audit trail.
